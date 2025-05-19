@@ -10,28 +10,22 @@ BASE_URL = "http://api.conceptnet.io"
 
 def get_related_concepts(term, lang="en", limit=10):
     """
-    Verilen terimle ilişkili kavramları ConceptNet üzerinden getirir.
+    ConceptNet API üzerinden verilen bir kavramla ilişkili kavramları çeker.
+    Sadece İngilizce kavramları döndürür.
     """
-    term = term.lower().replace(" ", "_")
-    url = f"{BASE_URL}/c/{lang}/{term}"
+    url = f"https://api.conceptnet.io/c/{lang}/{term}?offset=0&limit={limit}"
     response = requests.get(url)
-    
-    if response.status_code != 200:
-        print(f"Hata: {response.status_code}")
-        return []
-    
     data = response.json()
-    edges = data.get("edges", [])
-    
-    related = []
-    for edge in edges[:limit]:
-        start = edge.get("start", {}).get("label", "")
-        end = edge.get("end", {}).get("label", "")
-        rel = edge.get("rel", {}).get("label", "")
-        
-        if start.lower() != term:
-            related.append((start, rel, end))
-        else:
-            related.append((end, rel, start))
-    
-    return related
+
+    edges = []
+    for edge in data.get("edges", []):
+        rel = edge.get("rel", {}).get("label")
+        start = edge.get("start", {}).get("term")
+        end = edge.get("end", {}).get("term")
+
+        # Sadece İngilizce kavramları al
+        if start.startswith("/c/en/") and end.startswith("/c/en/"):
+            source = start.split("/")[3]
+            target = end.split("/")[3]
+            edges.append((target, rel, source))
+    return edges

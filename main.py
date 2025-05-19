@@ -30,17 +30,20 @@ def main():
     else:
         print("No semantic drift path found.")
 
-    # 🔁 Loop Drift Test
+       # 🔁 Loop Drift Test (İngilizce ve güvenli)
     print("\n🔁 Loop Drift Test:")
     accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
 
-    loop = looped_drift(G, start="air", steps=5, accepted_relations=accepted)
+    # Doğrudan "air" etrafında graph oluştur
+    G_loop = build_concept_graph("air", depth=2)
+
+    loop = looped_drift(G_loop, start="air", steps=5, accepted_relations=accepted)
 
     if loop:
         print("Looped semantic path:")
         for i in range(len(loop) - 1):
             a, b = loop[i], loop[i + 1]
-            rel = G.get_edge_data(a, b).get("label", "RelatedTo")
+            rel = G_loop.get_edge_data(a, b).get("label", "RelatedTo")
             print(f"{a} --[{rel}]--> {b}")
     else:
         print("No looped path found.")
