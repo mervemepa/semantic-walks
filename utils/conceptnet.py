@@ -8,7 +8,7 @@ BASE_URL = "http://api.conceptnet.io"
 
 
 
-def get_related_concepts(term, lang="en", limit=20):
+def get_related_concepts(term, lang="en", limit=10):
     """
     Verilen terimle ilişkili kavramları ConceptNet üzerinden getirir.
     """

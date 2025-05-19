@@ -1,9 +1,7 @@
-from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path
-from utils.concept_pools import concept_pools
+from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path, looped_drift
 from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
-from utils.semantic_drift import looped_drift
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -12,6 +10,12 @@ def main():
     end = "flying"
     depth = 1
 
+    # 🔨 Ana grafı ilk başta kur
+    print(f"\n🌐 Building graph from '{start}' with depth {depth}...")
+    G = build_concept_graph(start, depth=depth)
+    print(f"\n✅ Graph built: {len(G.nodes)} nodes, {len(G.edges)} edges")
+
+    # 🧪 Semantic Drift Test
     print("\n🧪 Testing Semantic Drift:")
     source_term = "nest"
     target_theme = concept_pools["technology"]
@@ -26,30 +30,29 @@ def main():
     else:
         print("No semantic drift path found.")
 
-        print("\n🔁 Loop Drift Test:")
-        accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
+    # 🔁 Loop Drift Test
+    print("\n🔁 Loop Drift Test:")
+    accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
 
-        loop = looped_drift(G, start="air", steps=5, accepted_relations=accepted)
+    loop = looped_drift(G, start="air", steps=5, accepted_relations=accepted)
 
-        if loop:
-           print("Looped semantic path:")
-           for i in range(len(loop) - 1):
-               a, b = loop[i], loop[i + 1]
-               rel = G.get_edge_data(a, b).get("label", "RelatedTo")
-               print(f"{a} --[{rel}]--> {b}")
-        else:
-            print("No looped path found.")
+    if loop:
+        print("Looped semantic path:")
+        for i in range(len(loop) - 1):
+            a, b = loop[i], loop[i + 1]
+            rel = G.get_edge_data(a, b).get("label", "RelatedTo")
+            print(f"{a} --[{rel}]--> {b}")
+    else:
+        print("No looped path found.")
 
+    # 📚 Havuz genişletme örneği
     print("\n📚 Expanding concept pool: 'air'")
     expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)
     print("Expanded air pool:")
     for word in expanded_air:
         print("-", word)
 
-    print(f"\n🌐 Building graph from '{start}' with depth {depth}...")
-    G = build_concept_graph(start, depth=depth)
-    print(f"\n✅ Graph built: {len(G.nodes)} nodes, {len(G.edges)} edges")
-
+    # 🌐 Pozisyonlar
     if start in G:
         pos = hierarchy_pos(G, start)
     else:
@@ -67,11 +70,9 @@ def main():
     else:
         print(f"\n⚠️ '{end}' not found in graph.")
 
-    # 🎲 Rastgele yürüyüş
+    # 🎲 Rastgele semantik yürüyüş
     while True:
         print("\n🎲 Random semantic walk:")
-        from utils.graph_builder import labeled_semantic_walk  # import etmeyi unutma
-
         walk = labeled_semantic_walk(G, start, steps=4)
         print("\n🧭 Semantic Walk:")
         for a, rel, b in walk:
@@ -80,9 +81,7 @@ def main():
         if again.lower() == "q":
             break
 
-    # 🌳 Hiyerarşik çizim (dosya yapısı gibi)
-    
-
+    # 🌳 Grafiği çiz ve kaydet
     plt.figure(figsize=(12, 8))
     nx.draw_networkx_nodes(G, pos, nodelist=pos.keys(), node_size=800, node_color="lightblue")
     nx.draw_networkx_labels(G, pos, labels={k: k for k in pos})
@@ -93,10 +92,7 @@ def main():
     plt.title(f"Concept Hierarchy from '{start}'")
     plt.axis("off")
     plt.tight_layout()
-    plt.show()
-
-    plt.tight_layout()
-    plt.savefig("concept_graph.png")  # ← Buraya ekle
+    plt.savefig("concept_graph.png")
     plt.show()
 
 if __name__ == "__main__":
