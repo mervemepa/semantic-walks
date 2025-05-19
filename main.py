@@ -3,6 +3,7 @@ from utils.concept_pools import concept_pools
 from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
+from utils.semantic_drift import looped_drift
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -24,6 +25,20 @@ def main():
             print(f"{a} --[{rel}]--> {b}")
     else:
         print("No semantic drift path found.")
+
+        print("\n🔁 Loop Drift Test:")
+        accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
+
+        loop = looped_drift(G, start="air", steps=5, accepted_relations=accepted)
+
+        if loop:
+           print("Looped semantic path:")
+           for i in range(len(loop) - 1):
+               a, b = loop[i], loop[i + 1]
+               rel = G.get_edge_data(a, b).get("label", "RelatedTo")
+               print(f"{a} --[{rel}]--> {b}")
+        else:
+            print("No looped path found.")
 
     print("\n📚 Expanding concept pool: 'air'")
     expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)
