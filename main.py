@@ -1,4 +1,4 @@
-from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path, looped_drift
+from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path, looped_drift, multi_node_loop
 from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
@@ -47,6 +47,29 @@ def main():
             print(f"{a} --[{rel}]--> {b}")
     else:
         print("No looped path found.")
+
+        # 🔁 Çoklu Kavram Loop Testi
+    print("\n🔁 Multi-node Loop Drift Test:")
+    loop_nodes = ["air", "wind", "breath", "atmosphere"]
+    accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
+
+    G_loop = build_extended_graph(loop_nodes, depth=2)
+
+    loop = []
+    for _ in range(10):  # 10 deneme yap, başarılı olursa dur
+        loop = multi_node_loop(G_loop, nodes=loop_nodes, steps=5, accepted_relations=accepted)
+        if loop:
+            break
+
+    if loop:
+        print("Looped path between core nodes:")
+        for i in range(len(loop) - 1):
+            a, b = loop[i], loop[i + 1]
+            rel = G_loop.get_edge_data(a, b).get("label", "RelatedTo")
+            print(f"{a} --[{rel}]--> {b}")
+        print(f"✅ Loop completed: {loop[0]} → ... → {loop[-1]}")
+    else:
+        print("❌ No looped path found after 10 attempts.")
 
     # 📚 Havuz genişletme örneği
     print("\n📚 Expanding concept pool: 'air'")
