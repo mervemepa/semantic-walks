@@ -82,3 +82,23 @@ def hierarchy_pos(G, root, width=1.0, vert_gap=0.2, vert_loc=0, xcenter=0.5,
                             vert_loc=vert_loc - vert_gap, xcenter=nextx,
                             pos=pos, parent=root, visited=visited)
     return pos
+
+def labeled_semantic_walk(G, start_node, steps=3):
+    """
+    Rastgele yürüyüş üretir ve her adımı ilişki etiketiyle döner.
+    Örnek çıktı: [(a, rel, b), (b, rel2, c), ...]
+    """
+    path = []
+    current = start_node
+
+    for _ in range(steps):
+        neighbors = list(G.successors(current))
+        if not neighbors:
+            break
+
+        next_node = random.choice(neighbors)
+        relation = G.get_edge_data(current, next_node).get("label", "RelatedTo")
+        path.append((current, relation, next_node))
+        current = next_node
+
+    return path

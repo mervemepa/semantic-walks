@@ -1,5 +1,5 @@
 from utils.conceptnet import get_related_concepts
-from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos
+from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -32,8 +32,12 @@ def main():
     # 🎲 Rastgele yürüyüş
     while True:
         print("\n🎲 Random semantic walk:")
-        walk = random_semantic_walk(G, start, steps=4)
-        print(" → ".join(walk))
+        from utils.graph_builder import labeled_semantic_walk  # import etmeyi unutma
+
+        walk = labeled_semantic_walk(G, start, steps=4)
+        print("\n🧭 Semantic Walk:")
+        for a, rel, b in walk:
+            print(f"{a} --[{rel}]--> {b}")
         again = input("\n↩️ Yeni bir yürüyüş için Enter’a bas, çıkmak için q yaz: ")
         if again.lower() == "q":
             break
