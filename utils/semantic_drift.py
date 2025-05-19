@@ -1,0 +1,41 @@
+import random
+import networkx as nx
+from utils.conceptnet import get_related_concepts
+from utils.graph_builder import build_concept_graph
+
+def build_extended_graph(core_terms, depth=2):
+    """
+    Verilen kelime listesi üzerinden genişletilmiş bir kavramsal ağ kurar.
+    """
+    G = nx.DiGraph()
+    for term in core_terms:
+        subgraph = build_concept_graph(term, depth=depth)
+        G.update(subgraph)
+    return G
+
+def semantic_drift(G, start, targets, max_steps=8):
+    """
+    Verilen graf üzerinde, bir kavramdan başlayarak hedef temaya yürüyen bir yol bulur.
+    """
+    for target in targets:
+        if target not in G:
+            continue
+        try:
+            path = nx.shortest_path(G, source=start, target=target)
+            if len(path) <= max_steps:
+                return path
+        except nx.NetworkXNoPath:
+            continue
+    return []
+
+def labeled_path(G, path):
+    """
+    Verilen yol içindeki her adımı ilişki etiketiyle birlikte döner.
+    """
+    labeled = []
+    for i in range(len(path) - 1):
+        source = path[i]
+        target = path[i + 1]
+        relation = G.get_edge_data(source, target).get("label", "RelatedTo")
+        labeled.append((source, relation, target))
+    return labeled
