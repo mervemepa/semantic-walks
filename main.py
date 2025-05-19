@@ -2,22 +2,21 @@ from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_p
 from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
+from utils.semantic_chain import themed_semantic_walk
+from utils.html_export import export_loop_to_html
 import networkx as nx
 import matplotlib.pyplot as plt
-from utils.html_export import export_loop_to_html
 
 def main():
     start = "bird"
     end = "flying"
     depth = 1
 
-    # 🔨 Ana grafı ilk başta kur
-    print(f"\n🌐 Building graph from '{start}' with depth {depth}...")
+    print(f"\n\U0001f310 Building graph from '{start}' with depth {depth}...")
     G = build_concept_graph(start, depth=depth)
     print(f"\n✅ Graph built: {len(G.nodes)} nodes, {len(G.edges)} edges")
 
-    # 🧪 Semantic Drift Test
-    print("\n🧪 Semantic Drift:")
+    print("\n\U0001f9ea Semantic Drift:")
     source_term = "nest"
     target_theme = concept_pools["technology"]
     G_ext = build_extended_graph([source_term] + target_theme, depth=2)
@@ -28,8 +27,7 @@ def main():
     else:
         print("No semantic drift path found.")
 
-    # 🔁 Geliştirilmiş Çoklu Kavram Loop
-    print("\n🔁 Multi-node Semantic Loop:")
+    print("\n\U0001f501 Multi-node Semantic Loop:")
     loop_nodes = ["air", "wind", "breath", "atmosphere", "oxygen", "gas"]
     accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
     G_loop = build_extended_graph(loop_nodes, depth=3)
@@ -46,25 +44,39 @@ def main():
             rel = G_loop.get_edge_data(a, b).get("label", "RelatedTo")
             print(f"{a} --[{rel}]--> {b}")
         print(f"✅ Loop completed: {loop[0]} → ... → {loop[-1]}")
+        export_loop_to_html(loop, G_loop, filename="semantic_loop.html")
+        print("📄 Loop exported to 'semantic_loop.html'")
     else:
         print("❌ No looped path found after 10 attempts.")
 
-    export_loop_to_html(loop, G_loop)
-    print("📄 Loop exported to 'semantic_loop.html'")
+    print("\n\U0001f9ed Themed Semantic Walk:")
+    theme_nodes = ["air", "breath", "wind", "atmosphere", "oxygen", "gas"]
+    G_theme = build_extended_graph(theme_nodes, depth=3)
 
-    # 📚 Havuz genişletme
+    chain = themed_semantic_walk(
+        G_theme,
+        start="air",
+        nodes=theme_nodes,
+        steps=5,
+        accepted_relations={"IsA", "UsedFor", "RelatedTo", "HasProperty", "CapableOf"}
+    )
+
+    if chain:
+        export_loop_to_html(chain, G_theme, filename="semantic_chain.html")
+        print("📄 Thematic chain exported to 'semantic_chain.html'")
+    else:
+        print("❌ No semantic chain could be formed.")
+
     print("\n📚 Expanding concept pool: 'air'")
     expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)
     for word in expanded_air:
         print("-", word)
 
-    # 🌐 Görselleştirme için pozisyon
     if start in G:
         pos = hierarchy_pos(G, start)
     else:
         pos = nx.spring_layout(G, seed=42)
 
-    # 🔗 En kısa yol
     if end in G:
         try:
             path = nx.shortest_path(G, source=start, target=end)
@@ -74,7 +86,6 @@ def main():
         except nx.NetworkXNoPath:
             print(f"\n🚫 No path found from '{start}' to '{end}'")
 
-    # 🎲 Rastgele yürüyüş
     while True:
         print("\n🎲 Random semantic walk:")
         walk = labeled_semantic_walk(G, start, steps=4)
@@ -85,7 +96,6 @@ def main():
         if again.lower() == "q":
             break
 
-    # 🌳 Görselleştirme
     plt.figure(figsize=(12, 8))
     nx.draw_networkx_nodes(G, pos, nodelist=pos.keys(), node_size=800, node_color="lightblue")
     nx.draw_networkx_labels(G, pos, labels={k: k for k in pos})
