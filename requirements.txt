@@ -2,3 +2,4 @@ requests
 jupyter
 networkx
 matplotlib
+requests-cache

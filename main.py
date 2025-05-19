@@ -23,10 +23,14 @@ def main():
     else:
         print(f"\n⚠️ '{end}' not found in graph.")
 
-    # 🎲 Rastgele semantik yürüyüş
-    print("\n🎲 Random semantic walk from start:")
-    walk = random_semantic_walk(G, start, steps=4)
-    print(" → ".join(walk))
+    # 🌀 Yürüyüş döngüsü
+    while True:
+        print("\n🎲 Random semantic walk:")
+        walk = random_semantic_walk(G, start, steps=4)
+        print(" → ".join(walk))
+        again = input("\n↩️ Yeni bir yürüyüş için Enter’a bas, çıkmak için q yaz: ")
+        if again.lower() == "q":
+            break
 
     # 🖼️ Grafiği çiz
     pos = nx.spring_layout(G, seed=42)
