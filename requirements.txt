@@ -1,0 +1,4 @@
+requests
+jupyter
+networkx
+matplotlib

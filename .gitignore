@@ -1,0 +1,12 @@
+# Sanal ortam
+venv/
+
+# Python derleme dosyaları
+__pycache__/
+*.pyc
+
+# Jupyter notebook geçici dosyaları
+.ipynb_checkpoints/
+
+# Mac sistem dosyaları
+.DS_Store
