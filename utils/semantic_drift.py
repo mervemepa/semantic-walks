@@ -3,6 +3,40 @@ import networkx as nx
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph
 
+
+
+def multi_node_loop(G, nodes, steps=5, accepted_relations=None):
+    """
+    Belirli bir kavram kümesi içinde döngüsel bir yürüyüş yapar.
+    Yürüyüş başladığı kavrama geri dönerse başarılı kabul edilir.
+    accepted_relations: geçerli ilişki türleri (örn: {"IsA", "UsedFor"})
+    """
+    start = random.choice(nodes)
+    path = [start]
+    current = start
+
+    for _ in range(steps):
+        neighbors = list(G.successors(current))
+        if accepted_relations:
+            neighbors = [
+                n for n in neighbors
+                if G.get_edge_data(current, n).get("label") in accepted_relations and n in nodes
+            ]
+        else:
+            neighbors = [n for n in neighbors if n in nodes]
+
+        if not neighbors:
+            return []
+        next_node = random.choice(neighbors)
+        path.append(next_node)
+        current = next_node
+
+    # Döngü tamamlandıysa
+    if path[-1] == path[0]:
+        return path
+    else:
+        return []
+
 def looped_drift(G, start, steps=6, accepted_relations=None):
     """
     Başlangıç kavramından çıkıp yine aynı kavrama dönen semantik bir döngü üretir.
