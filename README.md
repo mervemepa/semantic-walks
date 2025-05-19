@@ -4,17 +4,20 @@ This project explores the construction of semantic networks through ConceptNet A
 
 ## 🔍 Project Structure
 
+```
 semantic-walks/
 │
-├── main.py # Core script to build graph and run semantic walks
-├── requirements.txt # Required Python packages
-├── README.md # You’re reading this!
+├── main.py                      # Core script to build graph and run semantic walks
+├── requirements.txt             # Required Python packages
+├── README.md                    # You're reading this!
 │
 ├── utils/
-│ ├── conceptnet.py # Functions for querying ConceptNet API
-│ └── graph_builder.py # Functions for building graphs and semantic walks
+│   ├── conceptnet.py            # Functions for querying ConceptNet API
+│   ├── graph_builder.py         # Functions for building graphs and semantic walks
+│   └── concept_pools.py         # Thematic concept clusters and expansion logic
 │
-└── conceptnet_cache.sqlite # Local cache of API requests (auto-generated)
+└── conceptnet_cache.sqlite      # Local cache of API requests (auto-generated)
+```
 
 ---
 
@@ -26,46 +29,89 @@ Create a virtual environment and install dependencies:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+```
 
-Usage
+---
+
+## 🚀 Usage
 
 Run the main script:
 
+```bash
 python3 main.py
+```
 
 You will see:
-	•	ConceptNet graph construction from a starting word
-	•	Shortest semantic path to a target word
-	•	Randomized conceptual walks with semantic relationships
-	•	Optional: a hierarchical visualization of the concept graph
 
-Press Enter to generate a new walk or q to exit and view the graph.
+- ConceptNet graph construction from a starting word
+- Shortest semantic path to a target word
+- Randomized conceptual walks with semantic relationships
+- Optional: a hierarchical visualization of the concept graph
 
-Semantic Walk Format
+Press `Enter` to generate a new walk or `q` to exit.
+
+---
+
+## 🧐 Semantic Walk Format
 
 Each walk represents a meaningful traversal of the ConceptNet graph:
+
+```
 bird --[RelatedTo]--> nest
 nest --[AtLocation]--> tree
 tree --[UsedFor]--> shade
+```
+
 These relationships are sourced live (or from cache) and can serve as narrative seeds.
 
-API Caching
+---
 
-All ConceptNet queries are locally cached using requests-cache:
-	•	Cache file: conceptnet_cache.sqlite
-	•	Located in the root directory
-	•	Ensures faster access and enables offline exploration
+## 📦 API Caching
 
-Artistic Intent
+All ConceptNet queries are locally cached using `requests-cache`:
 
-This system was initially developed in relation to the Sub-Net Manifest project, which organized concept pools into dynamic manifesto sentences. By integrating ConceptNet’s semantic infrastructure, we aim to:
-	•	Enrich the vocabulary of manifestos
-	•	Allow thematic and relational expansion of concepts
-	•	Generate live or pre-structured narrative texts
-	•	Potentially associate semantic paths with audio/visual media
+- Cache file: `conceptnet_cache.sqlite`
+- Located in the root directory
+- Ensures faster access and enables offline exploration
 
-    Author
+---
 
-Developed by Merve Mepa
-With support from GPT-based semantic engineering experiments 🌱
+## 💡 Concept Pools (NEW!)
+
+You can define your own semantic "theme pools" like so:
+
+```python
+concept_pools = {
+    "nature": ["forest", "nest", "stone"],
+    "air": ["wind", "breath", "atmosphere"],
+    "technology": ["circuit", "signal", "machine"]
+}
 ```
+
+Then dynamically expand them via ConceptNet:
+
+```python
+expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)
+```
+
+This creates a live-growing vocabulary for each theme.
+
+---
+
+## 🔄 Roadmap / Modular Layers
+
+This project is structured to grow in modular layers:
+
+1. **Semantic Graph & Walk** – foundation (complete)
+2. **Concept Pool Expansion** – thematic clustering (in progress)
+3. **Semantic Drift Engine** – bridging themes with narrative transitions (next)
+4. **Manifest Generator** – walk-based sentence generation
+5. **Media Mapping** – audiovisual pairing for each concept
+6. **Interface Layer** – terminal, web, or installation interface
+
+---
+
+## 👩‍💻 Author
+
+Developed by Merve Yılmaz
+With support from GPT-based semantic engineering experiments 🌱
