@@ -1,3 +1,5 @@
+from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path
+from utils.concept_pools import concept_pools
 from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
@@ -8,6 +10,20 @@ def main():
     start = "bird"
     end = "flying"
     depth = 1
+
+    print("\n🧪 Testing Semantic Drift:")
+    source_term = "nest"
+    target_theme = concept_pools["technology"]
+
+    G_ext = build_extended_graph([source_term] + target_theme, depth=2)
+    drift_path = semantic_drift(G_ext, source_term, targets=target_theme, max_steps=6)
+
+    if drift_path:
+        print(f"Semantic drift from '{source_term}' toward 'technology':")
+        for a, rel, b in labeled_path(G_ext, drift_path):
+            print(f"{a} --[{rel}]--> {b}")
+    else:
+        print("No semantic drift path found.")
 
     print("\n📚 Expanding concept pool: 'air'")
     expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)

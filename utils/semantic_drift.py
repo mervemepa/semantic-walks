@@ -3,6 +3,32 @@ import networkx as nx
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph
 
+def looped_drift(G, start, steps=6, accepted_relations=None):
+    """
+    Başlangıç kavramından çıkıp yine aynı kavrama dönen semantik bir döngü üretir.
+    steps: ara adım sayısı (başlangıç ve kapanış hariç)
+    accepted_relations: filtrelemek istenen ilişki türleri (set)
+    """
+    path = [start]
+    current = start
+
+    for _ in range(steps):
+        neighbors = list(G.successors(current))
+        if accepted_relations:
+            neighbors = [n for n in neighbors
+                         if G.get_edge_data(current, n).get("label") in accepted_relations]
+        if not neighbors:
+            return []
+        next_node = random.choice(neighbors)
+        path.append(next_node)
+        current = next_node
+
+    if start in G.successors(current):
+        path.append(start)
+        return path
+    else:
+        return []  # döngü tamamlanamıyorsa boş dön
+
 def build_extended_graph(core_terms, depth=2):
     """
     Verilen kelime listesi üzerinden genişletilmiş bir kavramsal ağ kurar.
