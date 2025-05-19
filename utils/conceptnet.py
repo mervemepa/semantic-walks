@@ -1,6 +1,12 @@
 import requests
+import requests_cache
+
+# Cache sistemi aktif: aynı sorgu bir daha yapılmaz, dosyadan okunur
+requests_cache.install_cache("conceptnet_cache", expire_after=86400)
 
 BASE_URL = "http://api.conceptnet.io"
+
+
 
 def get_related_concepts(term, lang="en", limit=20):
     """
