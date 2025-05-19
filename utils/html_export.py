@@ -1,3 +1,5 @@
+
+
 def export_loop_to_html(loop, G, filename="semantic_loop.html"):
     with open(filename, "w") as f:
         f.write("<html><head><meta charset='utf-8'><style>")

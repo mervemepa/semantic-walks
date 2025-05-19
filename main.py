@@ -4,6 +4,7 @@ from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
 import networkx as nx
 import matplotlib.pyplot as plt
+from utils.html_export import export_loop_to_html
 
 def main():
     start = "bird"
@@ -47,6 +48,9 @@ def main():
         print(f"✅ Loop completed: {loop[0]} → ... → {loop[-1]}")
     else:
         print("❌ No looped path found after 10 attempts.")
+
+    export_loop_to_html(loop, G_loop)
+    print("📄 Loop exported to 'semantic_loop.html'")
 
     # 📚 Havuz genişletme
     print("\n📚 Expanding concept pool: 'air'")
