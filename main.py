@@ -1,3 +1,4 @@
+from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
 import networkx as nx
@@ -7,6 +8,12 @@ def main():
     start = "bird"
     end = "flying"
     depth = 1
+
+    print("\n📚 Expanding concept pool: 'air'")
+    expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)
+    print("Expanded air pool:")
+    for word in expanded_air:
+        print("-", word)
 
     print(f"\n🌐 Building graph from '{start}' with depth {depth}...")
     G = build_concept_graph(start, depth=depth)
