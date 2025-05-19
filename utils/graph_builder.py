@@ -35,3 +35,23 @@ def build_concept_graph(start_term, depth=2, lang="en", delay=1.0):
         time.sleep(delay)  # API'yi çok sık vurmayı önler
 
     return G
+
+import random
+
+def random_semantic_walk(G, start_node, steps=3):
+    """
+    Verilen graf içinde rastgele bir yürüyüş üretir.
+    Yürüyüş, semantik ilişkilere bağlı olarak yapılır.
+    """
+    path = [start_node]
+    current = start_node
+
+    for _ in range(steps):
+        neighbors = list(G.successors(current))
+        if not neighbors:
+            break  # çıkmaz sokak
+        next_node = random.choice(neighbors)
+        path.append(next_node)
+        current = next_node
+
+    return path

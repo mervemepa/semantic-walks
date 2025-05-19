@@ -1,21 +1,7 @@
-
-import matplotlib.pyplot as plt
-import networkx as nx
 from utils.conceptnet import get_related_concepts
-
-def main():
-    term = "bird"
-    relations = get_related_concepts(term)
-
-    print(f"\n📚 Relations for: {term}")
-    for idx, (related, relation, source) in enumerate(relations, 1):
-        print(f"{idx}. {source} --[{relation}]--> {related}")
-
-if __name__ == "__main__":
-    main()
-
-from utils.graph_builder import build_concept_graph
+from utils.graph_builder import build_concept_graph, random_semantic_walk
 import networkx as nx
+import matplotlib.pyplot as plt
 
 def main():
     start = "bird"
@@ -29,7 +15,7 @@ def main():
     if end in G:
         try:
             path = nx.shortest_path(G, source=start, target=end)
-            print(f"\n🔗 Path from '{start}' to '{end}':")
+            print(f"\n🔗 Shortest path from '{start}' to '{end}':")
             for step in path:
                 print(" →", step)
         except nx.NetworkXNoPath:
@@ -37,8 +23,13 @@ def main():
     else:
         print(f"\n⚠️ '{end}' not found in graph.")
 
-    # 🔵 Grafı çizme kısmı BURADA olacak:
-    pos = nx.spring_layout(G, seed=42)  # düğümlerin pozisyonu
+    # 🎲 Rastgele semantik yürüyüş
+    print("\n🎲 Random semantic walk from start:")
+    walk = random_semantic_walk(G, start, steps=4)
+    print(" → ".join(walk))
+
+    # 🖼️ Grafiği çiz
+    pos = nx.spring_layout(G, seed=42)
     plt.figure(figsize=(12, 8))
     nx.draw(G, pos, with_labels=True, node_size=800, node_color="lightblue",
             font_size=10, font_weight="bold", edge_color="gray")
@@ -48,7 +39,6 @@ def main():
     plt.axis("off")
     plt.tight_layout()
     plt.show()
-
 
 if __name__ == "__main__":
     main()
