@@ -1,5 +1,5 @@
 from utils.conceptnet import get_related_concepts
-from utils.graph_builder import build_concept_graph, random_semantic_walk
+from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -12,6 +12,12 @@ def main():
     G = build_concept_graph(start, depth=depth)
     print(f"\n✅ Graph built: {len(G.nodes)} nodes, {len(G.edges)} edges")
 
+    if start in G:
+        pos = hierarchy_pos(G, start)
+    else:
+        pos = nx.spring_layout(G, seed=42)
+
+    # 🔗 En kısa yol
     if end in G:
         try:
             path = nx.shortest_path(G, source=start, target=end)
@@ -23,7 +29,7 @@ def main():
     else:
         print(f"\n⚠️ '{end}' not found in graph.")
 
-    # 🌀 Yürüyüş döngüsü
+    # 🎲 Rastgele yürüyüş
     while True:
         print("\n🎲 Random semantic walk:")
         walk = random_semantic_walk(G, start, steps=4)
@@ -32,16 +38,23 @@ def main():
         if again.lower() == "q":
             break
 
-    # 🖼️ Grafiği çiz
-    pos = nx.spring_layout(G, seed=42)
+    # 🌳 Hiyerarşik çizim (dosya yapısı gibi)
+    
+
     plt.figure(figsize=(12, 8))
-    nx.draw(G, pos, with_labels=True, node_size=800, node_color="lightblue",
-            font_size=10, font_weight="bold", edge_color="gray")
+    nx.draw_networkx_nodes(G, pos, nodelist=pos.keys(), node_size=800, node_color="lightblue")
+    nx.draw_networkx_labels(G, pos, labels={k: k for k in pos})
+    nx.draw_networkx_edges(G, pos, edgelist=[(u, v) for u, v in G.edges() if u in pos and v in pos], edge_color="gray")
     edge_labels = nx.get_edge_attributes(G, "label")
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color="red")
-    plt.title(f"Concept Graph from '{start}'")
+    filtered_edge_labels = {(u, v): label for (u, v), label in edge_labels.items() if u in pos and v in pos}
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=filtered_edge_labels, font_color="red")
+    plt.title(f"Concept Hierarchy from '{start}'")
     plt.axis("off")
     plt.tight_layout()
+    plt.show()
+
+    plt.tight_layout()
+    plt.savefig("concept_graph.png")  # ← Buraya ekle
     plt.show()
 
 if __name__ == "__main__":
