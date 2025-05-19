@@ -28,6 +28,7 @@ def build_concept_graph(start_term, depth=2, lang="en", delay=1.0):
 
         for target, relation, source in relations:
             G.add_edge(source, target, label=relation)
+            print(f"📎 {source} --[{relation}]--> {target}")
             if target not in visited:
                 frontier.append((target, level + 1))
 

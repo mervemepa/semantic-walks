@@ -16,8 +16,8 @@ import networkx as nx
 
 def main():
     start = "bird"
-    end = "air"
-    depth = 1
+    end = "flying"   # veya "sky", "nest", "animal"
+    depth = 1     # istersen sonra 2 yaparız
 
     print(f"\n🌐 Building graph from '{start}' with depth {depth}...")
     G = build_concept_graph(start, depth=depth)
