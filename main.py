@@ -1,4 +1,4 @@
-from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path, looped_drift, multi_node_loop
+from utils.semantic_drift import build_extended_graph, semantic_drift, labeled_path, multi_node_loop
 from utils.concept_pools import concept_pools, expand_concept_pool
 from utils.conceptnet import get_related_concepts
 from utils.graph_builder import build_concept_graph, random_semantic_walk, hierarchy_pos, labeled_semantic_walk
@@ -16,53 +16,30 @@ def main():
     print(f"\n✅ Graph built: {len(G.nodes)} nodes, {len(G.edges)} edges")
 
     # 🧪 Semantic Drift Test
-    print("\n🧪 Testing Semantic Drift:")
+    print("\n🧪 Semantic Drift:")
     source_term = "nest"
     target_theme = concept_pools["technology"]
-
     G_ext = build_extended_graph([source_term] + target_theme, depth=2)
     drift_path = semantic_drift(G_ext, source_term, targets=target_theme, max_steps=6)
-
     if drift_path:
-        print(f"Semantic drift from '{source_term}' toward 'technology':")
         for a, rel, b in labeled_path(G_ext, drift_path):
             print(f"{a} --[{rel}]--> {b}")
     else:
         print("No semantic drift path found.")
 
-       # 🔁 Loop Drift Test (İngilizce ve güvenli)
-    print("\n🔁 Loop Drift Test:")
+    # 🔁 Geliştirilmiş Çoklu Kavram Loop
+    print("\n🔁 Multi-node Semantic Loop:")
+    loop_nodes = ["air", "wind", "breath", "atmosphere", "oxygen", "gas"]
     accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
-
-    # Doğrudan "air" etrafında graph oluştur
-    G_loop = build_concept_graph("air", depth=2)
-
-    loop = looped_drift(G_loop, start="air", steps=5, accepted_relations=accepted)
-
-    if loop:
-        print("Looped semantic path:")
-        for i in range(len(loop) - 1):
-            a, b = loop[i], loop[i + 1]
-            rel = G_loop.get_edge_data(a, b).get("label", "RelatedTo")
-            print(f"{a} --[{rel}]--> {b}")
-    else:
-        print("No looped path found.")
-
-        # 🔁 Çoklu Kavram Loop Testi
-    print("\n🔁 Multi-node Loop Drift Test:")
-    loop_nodes = ["air", "wind", "breath", "atmosphere"]
-    accepted = {"IsA", "UsedFor", "HasProperty", "CapableOf", "AtLocation"}
-
-    G_loop = build_extended_graph(loop_nodes, depth=2)
+    G_loop = build_extended_graph(loop_nodes, depth=3)
 
     loop = []
-    for _ in range(10):  # 10 deneme yap, başarılı olursa dur
-        loop = multi_node_loop(G_loop, nodes=loop_nodes, steps=5, accepted_relations=accepted)
+    for _ in range(10):
+        loop = multi_node_loop(G_loop, nodes=loop_nodes, steps=6, accepted_relations=accepted)
         if loop:
             break
 
     if loop:
-        print("Looped path between core nodes:")
         for i in range(len(loop) - 1):
             a, b = loop[i], loop[i + 1]
             rel = G_loop.get_edge_data(a, b).get("label", "RelatedTo")
@@ -71,14 +48,13 @@ def main():
     else:
         print("❌ No looped path found after 10 attempts.")
 
-    # 📚 Havuz genişletme örneği
+    # 📚 Havuz genişletme
     print("\n📚 Expanding concept pool: 'air'")
     expanded_air = expand_concept_pool(concept_pools["air"], per_word=5)
-    print("Expanded air pool:")
     for word in expanded_air:
         print("-", word)
 
-    # 🌐 Pozisyonlar
+    # 🌐 Görselleştirme için pozisyon
     if start in G:
         pos = hierarchy_pos(G, start)
     else:
@@ -93,10 +69,8 @@ def main():
                 print(" →", step)
         except nx.NetworkXNoPath:
             print(f"\n🚫 No path found from '{start}' to '{end}'")
-    else:
-        print(f"\n⚠️ '{end}' not found in graph.")
 
-    # 🎲 Rastgele semantik yürüyüş
+    # 🎲 Rastgele yürüyüş
     while True:
         print("\n🎲 Random semantic walk:")
         walk = labeled_semantic_walk(G, start, steps=4)
@@ -107,7 +81,7 @@ def main():
         if again.lower() == "q":
             break
 
-    # 🌳 Grafiği çiz ve kaydet
+    # 🌳 Görselleştirme
     plt.figure(figsize=(12, 8))
     nx.draw_networkx_nodes(G, pos, nodelist=pos.keys(), node_size=800, node_color="lightblue")
     nx.draw_networkx_labels(G, pos, labels={k: k for k in pos})
